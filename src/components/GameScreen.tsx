@@ -106,7 +106,7 @@ export function GameScreen({
       }, 1500);
     } else {
       const newAttempts = attempts + 1;
-      if (newAttempts >= 2) {
+      if (newAttempts >= 1) {
         onWrong(true);
         setFeedbackType("answer");
         setFeedbackText(`La réponse était ${currentQ.answer}`);
@@ -163,7 +163,7 @@ export function GameScreen({
       }, 1500);
     } else {
       const newAttempts = attempts + 1;
-      if (newAttempts >= 2) {
+      if (newAttempts >= 1) {
         onWrong(true);
         btns.forEach((btn) => {
           if ((btn as HTMLElement).textContent === currentQ.answer) {
