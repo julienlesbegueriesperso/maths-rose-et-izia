@@ -858,7 +858,8 @@ const App = () => {
         q.type === "division") &&
       numVal === q.answer
     ) {
-      setState({ ...state, locked: true, score: state.score + 1, attempts: 0 });
+      const newScore = state.score + 1;
+      setState({ ...state, locked: true, score: newScore, attempts: 0 });
       playSound("correct");
       setFeedbackType("correct");
       setFeedbackText("Bravo !");
@@ -867,7 +868,7 @@ const App = () => {
       spawnConfetti();
       setTimeout(() => {
         hideFeedback();
-        nextQuestion();
+        nextQuestion(newScore);
       }, 1500);
     } else {
       const newAttempts = state.attempts + 1;
@@ -880,7 +881,7 @@ const App = () => {
         shakeBricks();
         setTimeout(() => {
           hideFeedback();
-          nextQuestion();
+          nextQuestion(state.score);
         }, 2500);
       } else {
         setState({ ...state, attempts: newAttempts });
@@ -917,7 +918,8 @@ const App = () => {
     });
 
     if (choice === q.answer) {
-      setState({ ...state, locked: true, score: state.score + 1, attempts: 0 });
+      const newScore = state.score + 1;
+      setState({ ...state, locked: true, score: newScore, attempts: 0 });
       playSound("correct");
       setFeedbackType("correct");
       setFeedbackText("Bravo !");
@@ -926,7 +928,7 @@ const App = () => {
       spawnConfetti();
       setTimeout(() => {
         hideFeedback();
-        nextQuestion();
+        nextQuestion(newScore);
       }, 1500);
     } else {
       const newAttempts = state.attempts + 1;
@@ -944,7 +946,7 @@ const App = () => {
         setShowFeedback(true);
         setTimeout(() => {
           hideFeedback();
-          nextQuestion();
+          nextQuestion(state.score);
         }, 2500);
       } else {
         setState({ ...state, attempts: newAttempts });
@@ -966,15 +968,15 @@ const App = () => {
     }
   }
 
-  function nextQuestion() {
+  function nextQuestion(updatedScore = state.score) {
     const newIndex = state.qIndex + 1;
     if (newIndex >= TOTAL_QUESTIONS) {
-      setState({ ...state, screen: "results" });
+      setState({ ...state, screen: "results", score: updatedScore });
       playSound("star");
       spawnConfetti();
       setTimeout(spawnConfetti, 400);
     } else {
-      setState({ ...state, qIndex: newIndex, attempts: 0, locked: false });
+      setState({ ...state, qIndex: newIndex, attempts: 0, locked: false, score: updatedScore });
       // Clear input
       if (answerInputRef.current) {
         answerInputRef.current.value = "";
