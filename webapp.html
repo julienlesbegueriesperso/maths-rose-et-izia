@@ -1,0 +1,1669 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Lego Maths - Apprends en jouant !</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --bg: #fff5e6;
+                --fg: #2d2d2d;
+                --muted: #8a7a6a;
+                --card: #ffffff;
+                --border: #e8ddd0;
+                --red: #d01012;
+                --red-s: #a00d0f;
+                --green: #00852b;
+                --green-s: #005f1f;
+                --orange: #fe8a18;
+                --orange-s: #d07010;
+                --blue: #0057a8;
+                --blue-s: #003d76;
+                --yellow: #f5cd2f;
+                --yellow-s: #c8a820;
+                --pink: #f785b1;
+                --pink-s: #d06090;
+                --teal: #1a9e8f;
+                --teal-s: #127a6e;
+                --grey-brick: #c8c0b8;
+                --grey-brick-s: #a09890;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Nunito", sans-serif;
+                background: var(--bg);
+                color: var(--fg);
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            /* === BLOBS D'ARRIÈRE-PLAN === */
+            .bg-blob {
+                position: fixed;
+                border-radius: 50%;
+                filter: blur(80px);
+                opacity: 0.12;
+                pointer-events: none;
+                z-index: 0;
+            }
+            .blob-1 {
+                width: 300px;
+                height: 300px;
+                background: var(--red);
+                top: -80px;
+                left: -60px;
+                animation: blobFloat 18s infinite ease-in-out;
+            }
+            .blob-2 {
+                width: 250px;
+                height: 250px;
+                background: var(--yellow);
+                top: 20%;
+                right: -50px;
+                animation: blobFloat 22s infinite ease-in-out reverse;
+            }
+            .blob-3 {
+                width: 280px;
+                height: 280px;
+                background: var(--green);
+                bottom: -60px;
+                left: 30%;
+                animation: blobFloat 20s infinite ease-in-out 3s;
+            }
+            .blob-4 {
+                width: 200px;
+                height: 200px;
+                background: var(--blue);
+                top: 50%;
+                left: -40px;
+                animation: blobFloat 16s infinite ease-in-out 5s;
+            }
+
+            @keyframes blobFloat {
+                0%,
+                100% {
+                    transform: translate(0, 0) scale(1);
+                }
+                33% {
+                    transform: translate(30px, -20px) scale(1.05);
+                }
+                66% {
+                    transform: translate(-20px, 15px) scale(0.95);
+                }
+            }
+
+            /* === CONTENEUR PRINCIPAL === */
+            #app {
+                position: relative;
+                z-index: 1;
+                max-width: 500px;
+                margin: 0 auto;
+                padding: 16px;
+                min-height: 100vh;
+            }
+
+            /* === BRIQUES LEGO === */
+            .brick {
+                width: 30px;
+                height: 22px;
+                background: linear-gradient(
+                    180deg,
+                    var(--c) 0%,
+                    var(--c) 80%,
+                    var(--s) 100%
+                );
+                border-radius: 2px;
+                position: relative;
+                box-shadow:
+                    0 3px 0 0 var(--s),
+                    0 4px 5px rgba(0, 0, 0, 0.08);
+                flex-shrink: 0;
+                transition: transform 0.3s ease;
+            }
+            .brick .stud {
+                position: absolute;
+                width: 14px;
+                height: 7px;
+                left: 50%;
+                top: -5px;
+                transform: translateX(-50%);
+                border-radius: 50%;
+                background: radial-gradient(
+                    ellipse at 35% 25%,
+                    rgba(255, 255, 255, 0.5),
+                    var(--c) 55%,
+                    var(--s) 100%
+                );
+                box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.08);
+            }
+            .brick.bounce {
+                animation: brickBounce 0.6s ease calc(var(--d, 0) * 1s) forwards;
+            }
+            @keyframes brickBounce {
+                0%,
+                100% {
+                    transform: translateY(0);
+                }
+                25% {
+                    transform: translateY(-12px);
+                }
+                45% {
+                    transform: translateY(-4px);
+                }
+                65% {
+                    transform: translateY(-2px);
+                }
+            }
+            .brick.shake {
+                animation: brickShake 0.4s ease;
+            }
+            @keyframes brickShake {
+                0%,
+                100% {
+                    transform: translateX(0);
+                }
+                20% {
+                    transform: translateX(-4px);
+                }
+                40% {
+                    transform: translateX(4px);
+                }
+                60% {
+                    transform: translateX(-3px);
+                }
+                80% {
+                    transform: translateX(3px);
+                }
+            }
+
+            .brick-row {
+                display: flex;
+                gap: 3px;
+                flex-wrap: wrap;
+                align-items: flex-start;
+                padding-top: 7px;
+            }
+
+            .brick-group-label {
+                font-family: "Fredoka", sans-serif;
+                font-size: 0.85rem;
+                color: var(--muted);
+                margin-top: 6px;
+                text-align: center;
+            }
+
+            /* === PLAQUE LEGO (FRACTIONS) === */
+            .fraction-plate {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 3px;
+                justify-content: center;
+            }
+            .plate-section {
+                width: var(--pw, 72px);
+                height: var(--ph, 52px);
+                background: linear-gradient(
+                    180deg,
+                    var(--c) 0%,
+                    var(--c) 85%,
+                    var(--s) 100%
+                );
+                border-radius: 3px;
+                position: relative;
+                display: flex;
+                gap: 4px;
+                padding: 6px 6px 0;
+                box-shadow:
+                    0 2px 0 0 var(--s),
+                    0 3px 4px rgba(0, 0, 0, 0.06);
+                align-items: flex-start;
+                justify-content: center;
+            }
+            .plate-stud {
+                width: 13px;
+                height: 6px;
+                border-radius: 50%;
+                flex-shrink: 0;
+                background: radial-gradient(
+                    ellipse at 35% 25%,
+                    rgba(255, 255, 255, 0.45),
+                    var(--c) 50%,
+                    var(--s) 100%
+                );
+            }
+
+            /* === SÉPARATEUR DIVISION === */
+            .div-separator {
+                width: 2px;
+                background: repeating-linear-gradient(
+                    180deg,
+                    var(--muted) 0px,
+                    var(--muted) 4px,
+                    transparent 4px,
+                    transparent 8px
+                );
+                margin: 0 6px;
+                align-self: stretch;
+                opacity: 0.5;
+            }
+
+            /* === TYPOGRAPHIE === */
+            .title-lego {
+                font-family: "Fredoka", sans-serif;
+                font-weight: 700;
+                font-size: 2.8rem;
+                line-height: 1.1;
+                letter-spacing: -1px;
+            }
+            .title-lego span {
+                display: inline-block;
+            }
+            .subtitle {
+                font-size: 1.05rem;
+                color: var(--muted);
+                font-weight: 600;
+                margin-top: 6px;
+            }
+
+            /* === CARTES === */
+            .card {
+                background: var(--card);
+                border-radius: 16px;
+                border: 2px solid var(--border);
+                padding: 20px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+                transition:
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease;
+            }
+            .card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            }
+            .card:active {
+                transform: translateY(0);
+            }
+
+            /* === BOUTONS === */
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 14px 24px;
+                border-radius: 12px;
+                border: none;
+                font-family: "Nunito", sans-serif;
+                font-weight: 700;
+                font-size: 1rem;
+                cursor: pointer;
+                transition:
+                    transform 0.15s ease,
+                    box-shadow 0.15s ease;
+                text-decoration: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .btn:hover {
+                transform: translateY(-1px);
+            }
+            .btn:active {
+                transform: translateY(1px);
+            }
+            .btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .btn-red {
+                background: var(--red);
+                color: #fff;
+                box-shadow: 0 4px 0 0 var(--red-s);
+            }
+            .btn-green {
+                background: var(--green);
+                color: #fff;
+                box-shadow: 0 4px 0 0 var(--green-s);
+            }
+            .btn-orange {
+                background: var(--orange);
+                color: #fff;
+                box-shadow: 0 4px 0 0 var(--orange-s);
+            }
+            .btn-blue {
+                background: var(--blue);
+                color: #fff;
+                box-shadow: 0 4px 0 0 var(--blue-s);
+            }
+            .btn-pink {
+                background: var(--pink);
+                color: #fff;
+                box-shadow: 0 4px 0 0 var(--pink-s);
+            }
+            .btn-teal {
+                background: var(--teal);
+                color: #fff;
+                box-shadow: 0 4px 0 0 var(--teal-s);
+            }
+            .btn-yellow {
+                background: var(--yellow);
+                color: var(--fg);
+                box-shadow: 0 4px 0 0 var(--yellow-s);
+            }
+            .btn-outline {
+                background: transparent;
+                color: var(--muted);
+                border: 2px solid var(--border);
+                box-shadow: none;
+            }
+            .btn-outline:hover {
+                border-color: var(--muted);
+            }
+
+            .btn-full {
+                width: 100%;
+            }
+
+            /* === INPUT RÉPONSE === */
+            .answer-input {
+                width: 100%;
+                padding: 14px 18px;
+                font-family: "Fredoka", sans-serif;
+                font-size: 1.6rem;
+                font-weight: 600;
+                text-align: center;
+                border: 3px solid var(--border);
+                border-radius: 14px;
+                background: var(--card);
+                color: var(--fg);
+                outline: none;
+                transition: border-color 0.2s ease;
+                -moz-appearance: textfield;
+            }
+            .answer-input::-webkit-inner-spin-button,
+            .answer-input::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+            }
+            .answer-input:focus {
+                border-color: var(--teal);
+            }
+            .answer-input.shake {
+                animation: inputShake 0.4s ease;
+            }
+            @keyframes inputShake {
+                0%,
+                100% {
+                    transform: translateX(0);
+                }
+                20% {
+                    transform: translateX(-8px);
+                }
+                40% {
+                    transform: translateX(8px);
+                }
+                60% {
+                    transform: translateX(-5px);
+                }
+                80% {
+                    transform: translateX(5px);
+                }
+            }
+
+            /* === CHOIX FRACTION === */
+            .fraction-choices {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .fraction-choice {
+                padding: 14px;
+                border-radius: 12px;
+                border: 3px solid var(--border);
+                background: var(--card);
+                font-family: "Fredoka", sans-serif;
+                font-size: 1.4rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.15s ease;
+                text-align: center;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .fraction-choice:hover {
+                border-color: var(--orange);
+                background: #fff8f0;
+            }
+            .fraction-choice.correct {
+                border-color: var(--green);
+                background: #e8f5e9;
+                color: var(--green);
+            }
+            .fraction-choice.wrong {
+                border-color: var(--red);
+                background: #ffebee;
+                color: var(--red);
+            }
+            .fraction-choice.disabled {
+                pointer-events: none;
+                opacity: 0.6;
+            }
+
+            /* === BARRE DE PROGRESSION === */
+            .progress-bar {
+                width: 100%;
+                height: 8px;
+                background: var(--border);
+                border-radius: 4px;
+                overflow: hidden;
+            }
+            .progress-fill {
+                height: 100%;
+                border-radius: 4px;
+                transition: width 0.4s ease;
+            }
+
+            /* === FEEDBACK === */
+            .feedback-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 100;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+            .feedback-overlay.show {
+                opacity: 1;
+            }
+            .feedback-text {
+                font-family: "Fredoka", sans-serif;
+                font-size: 2.4rem;
+                font-weight: 700;
+                padding: 16px 36px;
+                border-radius: 20px;
+                animation: feedbackPop 0.4s ease;
+            }
+            @keyframes feedbackPop {
+                0% {
+                    transform: scale(0.5);
+                    opacity: 0;
+                }
+                60% {
+                    transform: scale(1.1);
+                }
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+            .feedback-correct {
+                background: rgba(0, 133, 43, 0.92);
+                color: #fff;
+            }
+            .feedback-wrong {
+                background: rgba(208, 16, 18, 0.88);
+                color: #fff;
+            }
+            .feedback-retry {
+                background: rgba(254, 138, 24, 0.9);
+                color: #fff;
+            }
+            .feedback-answer {
+                background: rgba(45, 45, 45, 0.88);
+                color: #fff;
+                font-size: 1.3rem;
+                padding: 12px 24px;
+            }
+
+            /* === ÉTOILES === */
+            .star {
+                font-size: 2.2rem;
+                transition:
+                    transform 0.3s ease,
+                    opacity 0.3s ease;
+            }
+            .star.filled {
+                color: var(--yellow);
+                transform: scale(1);
+            }
+            .star.empty {
+                color: var(--border);
+                transform: scale(0.85);
+                opacity: 0.5;
+            }
+
+            /* === PROFIL AVATAR === */
+            .avatar {
+                width: 64px;
+                height: 64px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.6rem;
+                color: #fff;
+            }
+
+            /* === MODULE ICONE === */
+            .module-icon {
+                width: 52px;
+                height: 52px;
+                border-radius: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.3rem;
+                color: #fff;
+                flex-shrink: 0;
+            }
+
+            /* === CANVAS CONFETTI === */
+            #confetti-canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 200;
+            }
+
+            /* === ANIMATIONS D'ENTRÉE === */
+            .fade-in {
+                animation: fadeIn 0.4s ease forwards;
+            }
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(12px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .fade-in-delay-1 {
+                animation-delay: 0.08s;
+                opacity: 0;
+            }
+            .fade-in-delay-2 {
+                animation-delay: 0.16s;
+                opacity: 0;
+            }
+            .fade-in-delay-3 {
+                animation-delay: 0.24s;
+                opacity: 0;
+            }
+            .fade-in-delay-4 {
+                animation-delay: 0.32s;
+                opacity: 0;
+            }
+
+            /* === VISUEL QUESTION === */
+            .visual-area {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                padding: 20px 10px;
+                min-height: 100px;
+            }
+            .visual-row {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .operator {
+                font-family: "Fredoka", sans-serif;
+                font-size: 1.8rem;
+                font-weight: 700;
+                color: var(--muted);
+                align-self: center;
+                padding-top: 4px;
+            }
+
+            /* === SCORE BADGE === */
+            .score-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                padding: 4px 10px;
+                border-radius: 20px;
+                background: #fff8e1;
+                font-family: "Fredoka", sans-serif;
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: #f5a623;
+            }
+
+            /* === RESPONSIVE === */
+            @media (max-width: 380px) {
+                .title-lego {
+                    font-size: 2.2rem;
+                }
+                .brick {
+                    width: 26px;
+                    height: 19px;
+                }
+                .brick .stud {
+                    width: 12px;
+                    height: 6px;
+                    top: -4px;
+                }
+                .plate-section {
+                    --pw: 58px;
+                    --ph: 44px;
+                }
+                .plate-stud {
+                    width: 11px;
+                    height: 5px;
+                }
+                .fraction-choice {
+                    font-size: 1.2rem;
+                    padding: 10px;
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Blobs d'arrière-plan -->
+        <div class="bg-blob blob-1"></div>
+        <div class="bg-blob blob-2"></div>
+        <div class="bg-blob blob-3"></div>
+        <div class="bg-blob blob-4"></div>
+
+        <!-- Canvas pour les confettis -->
+        <canvas id="confetti-canvas"></canvas>
+
+        <!-- Conteneur principal -->
+        <div id="app"></div>
+
+        <script>
+            // === ÉTAT DE L'APPLICATION ===
+            const state = {
+                screen: "home",
+                profile: null, // 'lea' ou 'emma'
+                module: null, // 'addition', 'multiplication', 'fraction', 'division'
+                difficulty: "easy", // 'easy' (6 ans) ou 'hard' (8 ans)
+                questions: [],
+                qIndex: 0,
+                score: 0,
+                attempts: 0,
+                locked: false, // empêcher double clic
+            };
+
+            const PROFILES = {
+                lea: {
+                    name: "Izia",
+                    age: 6,
+                    color: "var(--pink)",
+                    colorHex: "#F785B1",
+                    shadowHex: "#D06090",
+                    icon: "fa-wand-magic-sparkles",
+                },
+                emma: {
+                    name: "Rose",
+                    age: 8,
+                    color: "var(--teal)",
+                    colorHex: "#1A9E8F",
+                    shadowHex: "#127A6E",
+                    icon: "fa-bolt",
+                },
+            };
+
+            const MODULES = {
+                addition: {
+                    label: "Additions",
+                    icon: "fa-plus",
+                    color: "var(--red)",
+                    btnClass: "btn-red",
+                    desc: "Compter les briques",
+                },
+                multiplication: {
+                    label: "Multiplications",
+                    icon: "fa-xmark",
+                    color: "var(--green)",
+                    btnClass: "btn-green",
+                    desc: "Des rangées de briques",
+                },
+                fraction: {
+                    label: "Fractions",
+                    icon: "fa-chart-pie",
+                    color: "var(--orange)",
+                    btnClass: "btn-orange",
+                    desc: "Des parts de plaque",
+                },
+                division: {
+                    label: "Divisions",
+                    icon: "fa-arrows-split-up-and-left",
+                    color: "var(--blue)",
+                    btnClass: "btn-blue",
+                    desc: "Partager les briques",
+                },
+            };
+
+            const LEGO_COLORS = [
+                "#D01012",
+                "#00852B",
+                "#0057A8",
+                "#FE8A18",
+                "#F5CD2F",
+                "#F785B1",
+                "#1A9E8F",
+                "#8B5E3C",
+            ];
+
+            const TOTAL_QUESTIONS = 8;
+
+            // === UTILITAIRES ===
+            function randInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+            function shuffle(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = randInt(0, i);
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            function darken(hex, pct) {
+                const n = parseInt(hex.slice(1), 16);
+                const f = 1 - pct / 100;
+                const r = Math.max(0, Math.round((n >> 16) * f));
+                const g = Math.max(0, Math.round(((n >> 8) & 0xff) * f));
+                const b = Math.max(0, Math.round((n & 0xff) * f));
+                return (
+                    "#" +
+                    ((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")
+                );
+            }
+
+            // === SON ===
+            function playSound(type) {
+                try {
+                    const ctx = new (
+                        window.AudioContext || window.webkitAudioContext
+                    )();
+                    if (type === "correct") {
+                        [523.25, 659.25, 783.99].forEach((freq, i) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.type = "sine";
+                            osc.frequency.value = freq;
+                            gain.gain.setValueAtTime(
+                                0.12,
+                                ctx.currentTime + i * 0.1,
+                            );
+                            gain.gain.exponentialRampToValueAtTime(
+                                0.001,
+                                ctx.currentTime + i * 0.1 + 0.3,
+                            );
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.start(ctx.currentTime + i * 0.1);
+                            osc.stop(ctx.currentTime + i * 0.1 + 0.3);
+                        });
+                    } else if (type === "wrong") {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = "triangle";
+                        osc.frequency.value = 220;
+                        osc.frequency.linearRampToValueAtTime(
+                            160,
+                            ctx.currentTime + 0.25,
+                        );
+                        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(
+                            0.001,
+                            ctx.currentTime + 0.35,
+                        );
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(ctx.currentTime);
+                        osc.stop(ctx.currentTime + 0.35);
+                    } else if (type === "star") {
+                        [880, 1047, 1319].forEach((freq, i) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.type = "sine";
+                            osc.frequency.value = freq;
+                            gain.gain.setValueAtTime(
+                                0.08,
+                                ctx.currentTime + i * 0.12,
+                            );
+                            gain.gain.exponentialRampToValueAtTime(
+                                0.001,
+                                ctx.currentTime + i * 0.12 + 0.2,
+                            );
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.start(ctx.currentTime + i * 0.12);
+                            osc.stop(ctx.currentTime + i * 0.12 + 0.2);
+                        });
+                    }
+                } catch (e) {}
+            }
+
+            // === CONFETTIS ===
+            const confettiCanvas = document.getElementById("confetti-canvas");
+            const confettiCtx = confettiCanvas.getContext("2d");
+            let confettiParticles = [];
+            let confettiAnimId = null;
+
+            function resizeConfetti() {
+                confettiCanvas.width = window.innerWidth;
+                confettiCanvas.height = window.innerHeight;
+            }
+            window.addEventListener("resize", resizeConfetti);
+            resizeConfetti();
+
+            function spawnConfetti() {
+                const colors = [
+                    "#D01012",
+                    "#F5CD2F",
+                    "#00852B",
+                    "#0057A8",
+                    "#FE8A18",
+                    "#F785B1",
+                    "#1A9E8F",
+                ];
+                for (let i = 0; i < 55; i++) {
+                    confettiParticles.push({
+                        x: Math.random() * confettiCanvas.width,
+                        y: -20 - Math.random() * 80,
+                        vx: (Math.random() - 0.5) * 7,
+                        vy: Math.random() * 3 + 2,
+                        w: Math.random() * 8 + 4,
+                        h: Math.random() * 5 + 3,
+                        color: colors[
+                            Math.floor(Math.random() * colors.length)
+                        ],
+                        rotation: Math.random() * 360,
+                        rotSpeed: (Math.random() - 0.5) * 12,
+                        life: 1,
+                    });
+                }
+                if (!confettiAnimId) animateConfetti();
+            }
+
+            function animateConfetti() {
+                confettiCtx.clearRect(
+                    0,
+                    0,
+                    confettiCanvas.width,
+                    confettiCanvas.height,
+                );
+                confettiParticles.forEach((p) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.1;
+                    p.rotation += p.rotSpeed;
+                    p.life -= 0.006;
+                    confettiCtx.save();
+                    confettiCtx.translate(p.x, p.y);
+                    confettiCtx.rotate((p.rotation * Math.PI) / 180);
+                    confettiCtx.fillStyle = p.color;
+                    confettiCtx.globalAlpha = Math.max(0, p.life);
+                    confettiCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    confettiCtx.restore();
+                });
+                confettiParticles = confettiParticles.filter(
+                    (p) => p.life > 0 && p.y < confettiCanvas.height + 50,
+                );
+                if (confettiParticles.length > 0) {
+                    confettiAnimId = requestAnimationFrame(animateConfetti);
+                } else {
+                    confettiAnimId = null;
+                    confettiCtx.clearRect(
+                        0,
+                        0,
+                        confettiCanvas.width,
+                        confettiCanvas.height,
+                    );
+                }
+            }
+
+            // === GÉNÉRATION DE BRIQUES HTML ===
+            function brickHTML(color, delayIdx) {
+                const s = darken(color, 22);
+                const d =
+                    delayIdx !== undefined
+                        ? `--d:${(delayIdx * 0.04).toFixed(2)}s;`
+                        : "";
+                return `<div class="brick" style="--c:${color};--s:${s};${d}"><div class="stud"></div></div>`;
+            }
+
+            function brickRowHTML(count, color, startIdx) {
+                const si = startIdx || 0;
+                return (
+                    '<div class="brick-row">' +
+                    Array.from({ length: count }, (_, i) =>
+                        brickHTML(color, si + i),
+                    ).join("") +
+                    "</div>"
+                );
+            }
+
+            // === GÉNÉRATION DE QUESTIONS ===
+            function generateQuestions(module, difficulty) {
+                const qs = [];
+                for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+                    qs.push(generateOneQuestion(module, difficulty));
+                }
+                return qs;
+            }
+
+            function generateOneQuestion(module, diff) {
+                const c1 = LEGO_COLORS[randInt(0, 3)];
+                let c2 = LEGO_COLORS[randInt(4, 7)];
+                while (c2 === c1) c2 = LEGO_COLORS[randInt(4, 7)];
+
+                switch (module) {
+                    case "addition":
+                        return genAddition(diff, c1, c2);
+                    case "multiplication":
+                        return genMultiplication(diff, c1);
+                    case "fraction":
+                        return genFraction(diff, c1);
+                    case "division":
+                        return genDivision(diff, c1);
+                }
+            }
+
+            function genAddition(diff, c1, c2) {
+                let a, b;
+                if (diff === "easy") {
+                    a = randInt(1, 6);
+                    b = randInt(1, 6);
+                } else {
+                    a = randInt(3, 15);
+                    b = randInt(3, 15);
+                }
+                return { type: "addition", a, b, answer: a + b, c1, c2 };
+            }
+
+            function genMultiplication(diff, c1) {
+                let a, b;
+                if (diff === "easy") {
+                    // Tables 2, 3, 5
+                    const tables = [2, 3, 5];
+                    a = tables[randInt(0, 2)];
+                    b = randInt(1, 5);
+                    if (a * b > 15) {
+                        const tmp = b;
+                        b = Math.min(tmp, Math.floor(15 / a));
+                    }
+                } else {
+                    // Tables 4, 6, 7, 8
+                    const tables = [4, 6, 7, 8];
+                    a = tables[randInt(0, 3)];
+                    b = randInt(2, Math.min(6, Math.floor(36 / a)));
+                }
+                return { type: "multiplication", a, b, answer: a * b, c1 };
+            }
+
+            function genFraction(diff, c1) {
+                let num, den;
+                if (diff === "easy") {
+                    den = [2, 3, 4][randInt(0, 2)];
+                    num = randInt(1, den - 1);
+                } else {
+                    den = [3, 4, 5, 6][randInt(0, 3)];
+                    num = randInt(1, den - 1);
+                }
+                const correct = `${num}/${den}`;
+                const choices = [correct];
+                const used = new Set([correct]);
+                let tries = 0;
+                while (choices.length < 4 && tries < 50) {
+                    tries++;
+                    let n, d;
+                    const t = randInt(0, 2);
+                    if (t === 0) {
+                        n = randInt(1, den);
+                        d = den;
+                    } else if (t === 1) {
+                        n = num;
+                        d = [2, 3, 4, 5, 6][randInt(0, 4)];
+                        if (n >= d) d = n + randInt(1, 3);
+                    } else {
+                        n = randInt(1, 4);
+                        d = randInt(2, 6);
+                        if (n >= d) {
+                            n = 1;
+                            d = randInt(2, 5);
+                        }
+                    }
+                    const key = `${n}/${d}`;
+                    if (!used.has(key) && n > 0 && d > 1 && n < d) {
+                        used.add(key);
+                        choices.push(key);
+                    }
+                }
+                while (choices.length < 4) {
+                    choices.push(`${randInt(1, 2)}/${randInt(3, 6)}`);
+                }
+                return {
+                    type: "fraction",
+                    num,
+                    den,
+                    answer: correct,
+                    choices: shuffle(choices),
+                    c1,
+                };
+            }
+
+            function genDivision(diff, c1) {
+                let groups, perGroup;
+                if (diff === "easy") {
+                    groups = randInt(2, 3);
+                    perGroup = randInt(1, 5);
+                } else {
+                    groups = randInt(2, 6);
+                    perGroup = randInt(2, 8);
+                    if (groups * perGroup > 36)
+                        perGroup = Math.floor(36 / groups);
+                }
+                const total = groups * perGroup;
+                return {
+                    type: "division",
+                    total,
+                    groups,
+                    answer: perGroup,
+                    c1,
+                };
+            }
+
+            // === RENDU VISUEL DES QUESTIONS ===
+            function renderVisual(q) {
+                switch (q.type) {
+                    case "addition":
+                        return renderAdditionVisual(q);
+                    case "multiplication":
+                        return renderMultiplicationVisual(q);
+                    case "fraction":
+                        return renderFractionVisual(q);
+                    case "division":
+                        return renderDivisionVisual(q);
+                }
+            }
+
+            function renderAdditionVisual(q) {
+                return `<div class="visual-area">
+    <div class="visual-row">
+      ${brickRowHTML(q.a, q.c1, 0)}
+    </div>
+    <div class="brick-group-label">${q.a} brique${q.a > 1 ? "s" : ""}</div>
+    <div class="operator">+</div>
+    <div class="visual-row">
+      ${brickRowHTML(q.b, q.c2, q.a)}
+    </div>
+    <div class="brick-group-label">${q.b} brique${q.b > 1 ? "s" : ""}</div>
+    <div class="operator">=</div>
+    <div class="operator" style="color:var(--orange)">?</div>
+  </div>`;
+            }
+
+            function renderMultiplicationVisual(q) {
+                let rows = "";
+                let idx = 0;
+                for (let r = 0; r < q.a; r++) {
+                    rows += brickRowHTML(q.b, q.c1, idx);
+                    idx += q.b;
+                }
+                return `<div class="visual-area" style="gap:6px">
+    ${rows}
+    <div class="brick-group-label" style="margin-top:8px">
+      <i class="fa-solid fa-arrow-right" style="margin-right:4px"></i>
+      ${q.a} rangée${q.a > 1 ? "s" : ""} de ${q.b} briques
+    </div>
+  </div>`;
+            }
+
+            function renderFractionVisual(q) {
+                // Adapter la taille des sections selon le dénominateur
+                let pw = 72,
+                    ph = 52,
+                    studsPerSection = 3;
+                if (q.den >= 5) {
+                    pw = 58;
+                    ph = 48;
+                    studsPerSection = 2;
+                }
+                if (q.den >= 6) {
+                    pw = 52;
+                    ph = 44;
+                    studsPerSection = 2;
+                }
+
+                let sections = "";
+                for (let i = 0; i < q.den; i++) {
+                    const colored = i < q.num;
+                    const c = colored ? q.c1 : "#C8C0B8";
+                    const s = colored ? darken(q.c1, 22) : "#A09890";
+                    let studs = "";
+                    for (let j = 0; j < studsPerSection; j++) {
+                        studs += `<div class="plate-stud" style="--c:${c};--s:${s}"></div>`;
+                    }
+                    sections += `<div class="plate-section" style="--c:${c};--s:${s};--pw:${pw}px;--ph:${ph}px">${studs}</div>`;
+                }
+
+                return `<div class="visual-area" style="gap:14px">
+    <div class="fraction-plate">${sections}</div>
+    <div class="brick-group-label">
+      <i class="fa-solid fa-circle-question" style="margin-right:4px"></i>
+      Quelle fraction est colorée ?
+    </div>
+  </div>`;
+            }
+
+            function renderDivisionVisual(q) {
+                // Afficher les briques réparties en groupes
+                let html =
+                    '<div class="visual-area" style="gap:8px"><div class="visual-row" style="align-items:stretch">';
+                let idx = 0;
+                for (let g = 0; g < q.groups; g++) {
+                    if (g > 0) html += '<div class="div-separator"></div>';
+                    html +=
+                        '<div style="display:flex;flex-direction:column;gap:3px;align-items:center">';
+                    html += brickRowHTML(q.answer, q.c1, idx);
+                    idx += q.answer;
+                    if (q.groups <= 6)
+                        html += `<div class="brick-group-label" style="font-size:0.75rem">groupe ${g + 1}</div>`;
+                    html += "</div>";
+                }
+                html += "</div>";
+                html += `<div class="brick-group-label" style="margin-top:6px">
+    <i class="fa-solid fa-arrow-right" style="margin-right:4px"></i>
+    ${q.total} briques partagées en ${q.groups} groupes
+  </div></div>`;
+                return html;
+            }
+
+            // === RENDU DE LA QUESTION TEXTE ===
+            function renderQuestionText(q) {
+                switch (q.type) {
+                    case "addition":
+                        return `<p style="font-family:'Fredoka',sans-serif;font-size:1.3rem;font-weight:600;text-align:center">
+        Combien en tout ?<br><span style="color:var(--muted);font-size:1.1rem">${q.a} + ${q.b} = ?</span></p>`;
+                    case "multiplication":
+                        return `<p style="font-family:'Fredoka',sans-serif;font-size:1.3rem;font-weight:600;text-align:center">
+        Combien de briques ?<br><span style="color:var(--muted);font-size:1.1rem">${q.a} × ${q.b} = ?</span></p>`;
+                    case "fraction":
+                        return `<p style="font-family:'Fredoka',sans-serif;font-size:1.2rem;font-weight:600;text-align:center">
+        Choisis la bonne fraction :</p>`;
+                    case "division":
+                        return `<p style="font-family:'Fredoka',sans-serif;font-size:1.3rem;font-weight:600;text-align:center">
+        Combien par groupe ?<br><span style="color:var(--muted);font-size:1.1rem">${q.total} ÷ ${q.groups} = ?</span></p>`;
+                }
+            }
+
+            // === RENDU DE LA ZONE DE RÉPONSE ===
+            function renderAnswerArea(q) {
+                if (q.type === "fraction") {
+                    let btns = q.choices
+                        .map(
+                            (c) =>
+                                `<button class="fraction-choice" onclick="submitFraction('${c}')">${c}</button>`,
+                        )
+                        .join("");
+                    return `<div class="fraction-choices">${btns}</div>`;
+                }
+                return `<input type="number" class="answer-input" id="answer-input"
+    placeholder="?" autocomplete="off" inputmode="numeric"
+    onkeydown="if(event.key==='Enter')submitNumeric()">
+    <button class="btn btn-teal btn-full" style="margin-top:10px" onclick="submitNumeric()">
+      <i class="fa-solid fa-check"></i> Valider
+    </button>`;
+            }
+
+            // === ÉCRANS ===
+            function render() {
+                const app = document.getElementById("app");
+                switch (state.screen) {
+                    case "home":
+                        app.innerHTML = renderHome();
+                        break;
+                    case "modules":
+                        app.innerHTML = renderModules();
+                        break;
+                    case "game":
+                        app.innerHTML = renderGame();
+                        break;
+                    case "results":
+                        app.innerHTML = renderResults();
+                        break;
+                }
+                // Focus sur l'input si en jeu
+                if (state.screen === "game") {
+                    setTimeout(() => {
+                        const inp = document.getElementById("answer-input");
+                        if (inp) inp.focus();
+                    }, 100);
+                }
+            }
+
+            function renderHome() {
+                const titleColors = [
+                    "#D01012",
+                    "#F5CD2F",
+                    "#00852B",
+                    "#0057A8",
+                    "#FE8A18",
+                    "#F785B1",
+                    "#1A9E8F",
+                    "#8B5E3C",
+                    "#D01012",
+                    "#F5CD2F",
+                ];
+                const letters = "Lego Maths";
+                let titleHTML = "";
+                for (let i = 0; i < letters.length; i++) {
+                    if (letters[i] === " ") {
+                        titleHTML += "<span>&nbsp;</span>";
+                    } else {
+                        titleHTML += `<span style="color:${titleColors[i % titleColors.length]}">${letters[i]}</span>`;
+                    }
+                }
+
+                return `<div style="text-align:center;padding-top:12vh">
+    <div class="title-lego fade-in">${titleHTML}</div>
+    <p class="subtitle fade-in fade-in-delay-1">Apprends les maths en jouant avec des briques !</p>
+    <div style="margin-top:40px;display:flex;flex-direction:column;gap:14px;max-width:300px;margin-left:auto;margin-right:auto">
+      <button class="btn btn-pink btn-full fade-in fade-in-delay-2" onclick="selectProfile('lea')">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Izia — 6 ans
+      </button>
+      <button class="btn btn-teal btn-full fade-in fade-in-delay-3" onclick="selectProfile('emma')">
+        <i class="fa-solid fa-bolt"></i> Rose — 8 ans
+      </button>
+    </div>
+    <div style="margin-top:50px;display:flex;gap:3px;justify-content:center;flex-wrap:wrap;opacity:0.35" class="fade-in fade-in-delay-4">
+      ${Array.from({ length: 12 }, (_, i) => brickHTML(LEGO_COLORS[i % LEGO_COLORS.length])).join("")}
+    </div>
+  </div>`;
+            }
+
+            function renderModules() {
+                const p = PROFILES[state.profile];
+                const moduleKeys = [
+                    "addition",
+                    "multiplication",
+                    "fraction",
+                    "division",
+                ];
+                const delays = [
+                    "fade-in-delay-1",
+                    "fade-in-delay-2",
+                    "fade-in-delay-3",
+                    "fade-in-delay-4",
+                ];
+
+                let cards = moduleKeys
+                    .map((key, i) => {
+                        const m = MODULES[key];
+                        return `<button class="card fade-in ${delays[i]}" style="display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;width:100%;border-color:${m.color}"
+      onclick="startGame('${key}')">
+      <div class="module-icon" style="background:${m.color}">
+        <i class="fa-solid ${m.icon}"></i>
+      </div>
+      <div>
+        <div style="font-family:'Fredoka',sans-serif;font-weight:600;font-size:1.15rem">${m.label}</div>
+        <div style="font-size:0.85rem;color:var(--muted)">${m.desc}</div>
+      </div>
+      <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:var(--muted);font-size:0.85rem"></i>
+    </button>`;
+                    })
+                    .join("");
+
+                return `<div>
+    <button class="btn btn-outline fade-in" onclick="goHome()" style="margin-bottom:20px">
+      <i class="fa-solid fa-arrow-left"></i> Retour
+    </button>
+    <div class="fade-in" style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <div class="avatar" style="background:${p.color}">
+        <i class="fa-solid ${p.icon}"></i>
+      </div>
+      <div>
+        <div style="font-family:'Fredoka',sans-serif;font-weight:700;font-size:1.3rem">${p.name}</div>
+        <div style="font-size:0.85rem;color:var(--muted)">${p.age} ans — Niveau ${state.difficulty === "easy" ? "Débutant" : "Avancé"}</div>
+      </div>
+    </div>
+    <p style="font-family:'Fredoka',sans-serif;font-weight:600;font-size:1.1rem;margin-bottom:14px" class="fade-in">Choisis un exercice :</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${cards}
+    </div>
+  </div>`;
+            }
+
+            function renderGame() {
+                const q = state.questions[state.qIndex];
+                const m = MODULES[state.module];
+                const progress = (state.qIndex / TOTAL_QUESTIONS) * 100;
+
+                return `<div>
+    <!-- En-tête -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px" class="fade-in">
+      <button class="btn btn-outline" style="padding:8px 12px;font-size:0.85rem" onclick="confirmQuit()">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div style="font-family:'Fredoka',sans-serif;font-weight:600;font-size:1rem;color:${m.color}">
+        <i class="fa-solid ${m.icon}" style="margin-right:4px"></i>${m.label}
+      </div>
+      <div class="score-badge">
+        <i class="fa-solid fa-star"></i> ${state.score}/${TOTAL_QUESTIONS}
+      </div>
+    </div>
+
+    <!-- Barre de progression -->
+    <div class="progress-bar fade-in" style="margin-bottom:20px">
+      <div class="progress-fill" style="width:${progress}%;background:${m.color}"></div>
+    </div>
+
+    <!-- Numéro de question -->
+    <div style="text-align:center;font-size:0.85rem;color:var(--muted);margin-bottom:12px" class="fade-in">
+      Question ${state.qIndex + 1} sur ${TOTAL_QUESTIONS}
+    </div>
+
+    <!-- Zone visuelle Lego -->
+    <div class="card fade-in" style="margin-bottom:16px;overflow-x:auto" id="visual-card">
+      ${renderVisual(q)}
+    </div>
+
+    <!-- Question texte -->
+    <div class="fade-in fade-in-delay-1" style="margin-bottom:16px">
+      ${renderQuestionText(q)}
+    </div>
+
+    <!-- Zone de réponse -->
+    <div class="fade-in fade-in-delay-2" id="answer-area">
+      ${renderAnswerArea(q)}
+    </div>
+  </div>
+  <div class="feedback-overlay" id="feedback-overlay">
+    <div class="feedback-text" id="feedback-text"></div>
+  </div>`;
+            }
+
+            function renderResults() {
+                const m = MODULES[state.module];
+                const p = PROFILES[state.profile];
+                const pct = state.score / TOTAL_QUESTIONS;
+
+                let message, emoji;
+                if (pct === 1) {
+                    message = "Incroyable ! Tu es une championne !";
+                } else if (pct >= 0.75) {
+                    message = "Bravo ! C'est super bien !";
+                } else if (pct >= 0.5) {
+                    message = "Bien joué ! Continue comme ça !";
+                } else if (pct >= 0.25) {
+                    message = "Pas mal ! Tu t'améliores !";
+                } else {
+                    message = "Continue de t'entraîner, tu vas y arriver !";
+                }
+
+                let starsHTML = "";
+                for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+                    starsHTML += `<span class="star ${i < state.score ? "filled" : "empty"}" style="animation-delay:${i * 0.08}s">
+      <i class="fa-solid fa-star"></i>
+    </span>`;
+                }
+
+                return `<div style="text-align:center;padding-top:6vh">
+    <div class="fade-in" style="margin-bottom:24px">
+      <div class="avatar" style="background:${p.color};width:72px;height:72px;font-size:1.8rem;margin:0 auto 12px">
+        <i class="fa-solid ${p.icon}"></i>
+      </div>
+      <div style="font-family:'Fredoka',sans-serif;font-weight:700;font-size:1.3rem">${p.name} — ${m.label}</div>
+    </div>
+
+    <div class="fade-in fade-in-delay-1" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:20px">
+      ${starsHTML}
+    </div>
+
+    <div class="card fade-in fade-in-delay-2" style="margin-bottom:20px">
+      <div style="font-family:'Fredoka',sans-serif;font-weight:700;font-size:2rem;color:${m.color};margin-bottom:4px">
+        ${state.score} / ${TOTAL_QUESTIONS}
+      </div>
+      <div style="color:var(--muted);font-size:1rem">${message}</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;max-width:280px;margin:0 auto" class="fade-in fade-in-delay-3">
+      <button class="btn ${m.btnClass} btn-full" onclick="startGame('${state.module}')">
+        <i class="fa-solid fa-rotate-right"></i> Rejouer
+      </button>
+      <button class="btn btn-outline btn-full" onclick="state.screen='modules';render()">
+        <i class="fa-solid fa-grid-2"></i> Autres exercices
+      </button>
+      <button class="btn btn-outline btn-full" onclick="goHome()">
+        <i class="fa-solid fa-house"></i> Accueil
+      </button>
+    </div>
+  </div>`;
+            }
+
+            // === LOGIQUE DE JEU ===
+            function selectProfile(name) {
+                state.profile = name;
+                state.difficulty = name === "lea" ? "easy" : "hard";
+                state.screen = "modules";
+                render();
+            }
+
+            function goHome() {
+                state.screen = "home";
+                state.profile = null;
+                state.module = null;
+                render();
+            }
+
+            function startGame(module) {
+                state.module = module;
+                state.qIndex = 0;
+                state.score = 0;
+                state.attempts = 0;
+                state.locked = false;
+                state.questions = generateQuestions(module, state.difficulty);
+                state.screen = "game";
+                render();
+            }
+
+            function confirmQuit() {
+                // Afficher un modal simple au lieu de confirm()
+                const overlay = document.createElement("div");
+                overlay.style.cssText =
+                    "position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:150;display:flex;align-items:center;justify-content:center;padding:20px";
+                overlay.innerHTML = `<div class="card" style="max-width:300px;text-align:center">
+    <p style="font-family:'Fredoka',sans-serif;font-weight:600;font-size:1.1rem;margin-bottom:16px">Arrêter l'exercice ?</p>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline" style="flex:1" onclick="maskFeedback();render()">Continuer</button>
+      <button class="btn btn-red" style="flex:1" onclick="maskFeedback();state.screen='modules';render()">Arrêter</button>
+    </div>
+  </div>`;
+                document.body.appendChild(overlay);
+            }
+
+            function showFeedback(type, text) {
+                const overlay = document.getElementById("feedback-overlay");
+                const textEl = document.getElementById("feedback-text");
+                if (!overlay || !textEl) return;
+                textEl.className = "feedback-text";
+                if (type === "correct")
+                    textEl.classList.add("feedback-correct");
+                else if (type === "wrong")
+                    textEl.classList.add("feedback-wrong");
+                else if (type === "retry")
+                    textEl.classList.add("feedback-retry");
+                else textEl.classList.add("feedback-answer");
+                textEl.textContent = text;
+                overlay.classList.add("show");
+                setTimeout(
+                    () => overlay.classList.remove("show"),
+                    type === "answer" ? 2200 : 1200,
+                );
+            }
+
+            function maskFeedback() {
+                const overlay = document.getElementById("feedback-overlay");
+                if (overlay) {
+                    overlay.classList.remove("show");
+                }
+            }
+
+            function bounceBricks() {
+                document
+                    .querySelectorAll(".brick")
+                    .forEach((b) => b.classList.add("bounce"));
+            }
+
+            function shakeBricks() {
+                document
+                    .querySelectorAll(".brick")
+                    .forEach((b) => b.classList.add("shake"));
+                setTimeout(
+                    () =>
+                        document
+                            .querySelectorAll(".brick")
+                            .forEach((b) => b.classList.remove("shake")),
+                    500,
+                );
+            }
+
+            function submitNumeric() {
+                if (state.locked) return;
+                const inp = document.getElementById("answer-input");
+                if (!inp) return;
+                const val = inp.value.trim();
+                if (val === "") return;
+                const numVal = parseInt(val, 10);
+                if (isNaN(numVal)) return;
+
+                const q = state.questions[state.qIndex];
+
+                if (numVal === q.answer) {
+                    state.locked = true;
+                    state.score++;
+                    state.attempts = 0;
+                    playSound("correct");
+                    showFeedback("correct", "Bravo !");
+                    bounceBricks();
+                    spawnConfetti();
+                    setTimeout(nextQuestion, 1500);
+                } else {
+                    state.attempts++;
+                    if (state.attempts >= 2) {
+                        state.locked = true;
+                        playSound("wrong");
+                        showFeedback("answer", `La réponse était ${q.answer}`);
+                        shakeBricks();
+                        setTimeout(nextQuestion, 2500);
+                    } else {
+                        playSound("wrong");
+                        showFeedback("retry", "Essaie encore !");
+                        shakeBricks();
+                        inp.value = "";
+                        inp.classList.add("shake");
+                        setTimeout(() => inp.classList.remove("shake"), 500);
+                        setTimeout(() => inp.focus(), 500);
+                    }
+                }
+            }
+
+            function submitFraction(choice) {
+                if (state.locked) return;
+                const q = state.questions[state.qIndex];
+                const btns = document.querySelectorAll(".fraction-choice");
+
+                btns.forEach((btn) => {
+                    btn.classList.add("disabled");
+                    if (btn.textContent === choice && choice === q.answer)
+                        btn.classList.add("correct");
+                    else if (btn.textContent === choice && choice !== q.answer)
+                        btn.classList.add("wrong");
+                });
+
+                if (choice === q.answer) {
+                    state.locked = true;
+                    state.score++;
+                    state.attempts = 0;
+                    playSound("correct");
+                    showFeedback("correct", "Bravo !");
+                    bounceBricks();
+                    spawnConfetti();
+                    setTimeout(nextQuestion, 1500);
+                } else {
+                    state.attempts++;
+                    if (state.attempts >= 2) {
+                        state.locked = true;
+                        playSound("wrong");
+                        // Montrer la bonne réponse
+                        btns.forEach((btn) => {
+                            if (btn.textContent === q.answer)
+                                btn.classList.add("correct");
+                        });
+                        showFeedback("answer", `C'était ${q.answer}`);
+                        setTimeout(nextQuestion, 2500);
+                    } else {
+                        playSound("wrong");
+                        showFeedback("retry", "Essaie encore !");
+                        // Réactiver les boutons sauf celui cliqué
+                        setTimeout(() => {
+                            btns.forEach((btn) => {
+                                btn.classList.remove("disabled", "wrong");
+                                if (btn.textContent === choice)
+                                    btn.style.opacity = "0.4";
+                            });
+                        }, 500);
+                    }
+                }
+            }
+
+            function nextQuestion() {
+                state.qIndex++;
+                state.attempts = 0;
+                state.locked = false;
+                if (state.qIndex >= TOTAL_QUESTIONS) {
+                    state.screen = "results";
+                    playSound("star");
+                    spawnConfetti();
+                    setTimeout(spawnConfetti, 400);
+                }
+                render();
+            }
+
+            // === INITIALISATION ===
+            render();
+        </script>
+    </body>
+</html>

@@ -1,0 +1,875 @@
+:root {
+    --bg: #fff5e6;
+    --fg: #2d2d2d;
+    --muted: #8a7a6a;
+    --card: #ffffff;
+    --border: #e8ddd0;
+    --red: #d01012;
+    --red-s: #a00d0f;
+    --green: #00852b;
+    --green-s: #005f1f;
+    --orange: #fe8a18;
+    --orange-s: #d07010;
+    --blue: #0057a8;
+    --blue-s: #003d76;
+    --yellow: #f5cd2f;
+    --yellow-s: #c8a820;
+    --pink: #f785b1;
+    --pink-s: #d06090;
+    --teal: #1a9e8f;
+    --teal-s: #127a6e;
+    --grey-brick: #c8c0b8;
+    --grey-brick-s: #a09890;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Nunito", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+#root {
+    position: relative;
+    z-index: 1;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 16px;
+    min-height: 100vh;
+}
+
+/* === BLOBS D'ARRIÈRE-PLAN === */
+.bg-blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+}
+.blob-1 {
+    width: 300px;
+    height: 300px;
+    background: var(--red);
+    top: -80px;
+    left: -60px;
+    animation: blobFloat 18s infinite ease-in-out;
+}
+.blob-2 {
+    width: 250px;
+    height: 250px;
+    background: var(--yellow);
+    top: 20%;
+    right: -50px;
+    animation: blobFloat 22s infinite ease-in-out reverse;
+}
+.blob-3 {
+    width: 280px;
+    height: 280px;
+    background: var(--green);
+    bottom: -60px;
+    left: 30%;
+    animation: blobFloat 20s infinite ease-in-out 3s;
+}
+.blob-4 {
+    width: 200px;
+    height: 200px;
+    background: var(--blue);
+    top: 50%;
+    left: -40px;
+    animation: blobFloat 16s infinite ease-in-out 5s;
+}
+
+@keyframes blobFloat {
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(30px, -20px) scale(1.05);
+    }
+    66% {
+        transform: translate(-20px, 15px) scale(0.95);
+    }
+}
+
+/* === BRIQUES LEGO === */
+.brick {
+    width: 30px;
+    height: 22px;
+    background: linear-gradient(
+        180deg,
+        var(--c) 0%,
+        var(--c) 80%,
+        var(--s) 100%
+    );
+    border-radius: 2px;
+    position: relative;
+    box-shadow:
+        0 3px 0 0 var(--s),
+        0 4px 5px rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+.brick .stud {
+    position: absolute;
+    width: 14px;
+    height: 7px;
+    left: 50%;
+    top: -5px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(
+        ellipse at 35% 25%,
+        rgba(255, 255, 255, 0.5),
+        var(--c) 55%,
+        var(--s) 100%
+    );
+    box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.08);
+}
+.brick.bounce {
+    animation: brickBounce 0.6s ease calc(var(--d, 0) * 1s) forwards;
+}
+@keyframes brickBounce {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    25% {
+        transform: translateY(-12px);
+    }
+    45% {
+        transform: translateY(-4px);
+    }
+    65% {
+        transform: translateY(-2px);
+    }
+}
+.brick.shake {
+    animation: brickShake 0.4s ease;
+}
+@keyframes brickShake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    20% {
+        transform: translateX(-4px);
+    }
+    40% {
+        transform: translateX(4px);
+    }
+    60% {
+        transform: translateX(-3px);
+    }
+    80% {
+        transform: translateX(3px);
+    }
+}
+
+.brick-row {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding-top: 7px;
+}
+
+.brick-group-label {
+    font-family: "Fredoka", sans-serif;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 6px;
+    text-align: center;
+}
+
+/* === PLAQUE LEGO (FRACTIONS) === */
+.fraction-plate {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    justify-content: center;
+}
+.plate-section {
+    width: var(--pw, 72px);
+    height: var(--ph, 52px);
+    background: linear-gradient(
+        180deg,
+        var(--c) 0%,
+        var(--c) 85%,
+        var(--s) 100%
+    );
+    border-radius: 3px;
+    position: relative;
+    display: flex;
+    gap: 4px;
+    padding: 6px 6px 0;
+    box-shadow:
+        0 2px 0 0 var(--s),
+        0 3px 4px rgba(0, 0, 0, 0.06);
+    align-items: flex-start;
+    justify-content: center;
+}
+.plate-stud {
+    width: 13px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: radial-gradient(
+        ellipse at 35% 25%,
+        rgba(255, 255, 255, 0.45),
+        var(--c) 50%,
+        var(--s) 100%
+    );
+}
+
+/* === SÉPARATEUR DIVISION === */
+.div-separator {
+    width: 2px;
+    background: repeating-linear-gradient(
+        180deg,
+        var(--muted) 0px,
+        var(--muted) 4px,
+        transparent 4px,
+        transparent 8px
+    );
+    margin: 0 6px;
+    align-self: stretch;
+    opacity: 0.5;
+}
+
+/* === TYPOGRAPHIE === */
+.title-lego {
+    font-family: "Fredoka", sans-serif;
+    font-weight: 700;
+    font-size: 2.8rem;
+    line-height: 1.1;
+    letter-spacing: -1px;
+}
+.title-lego span {
+    display: inline-block;
+}
+.subtitle {
+    font-size: 1.05rem;
+    color: var(--muted);
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+/* === CARTES === */
+.card {
+    background: var(--card);
+    border-radius: 16px;
+    border: 2px solid var(--border);
+    padding: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+.card:active {
+    transform: translateY(0);
+}
+
+/* === BOUTONS === */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border-radius: 12px;
+    border: none;
+    font-family: "Nunito", sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.btn:hover {
+    transform: translateY(-1px);
+}
+.btn:active {
+    transform: translateY(1px);
+}
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-red {
+    background: var(--red);
+    color: #fff;
+    box-shadow: 0 4px 0 0 var(--red-s);
+}
+.btn-green {
+    background: var(--green);
+    color: #fff;
+    box-shadow: 0 4px 0 0 var(--green-s);
+}
+.btn-orange {
+    background: var(--orange);
+    color: #fff;
+    box-shadow: 0 4px 0 0 var(--orange-s);
+}
+.btn-blue {
+    background: var(--blue);
+    color: #fff;
+    box-shadow: 0 4px 0 0 var(--blue-s);
+}
+.btn-pink {
+    background: var(--pink);
+    color: #fff;
+    box-shadow: 0 4px 0 0 var(--pink-s);
+}
+.btn-teal {
+    background: var(--teal);
+    color: #fff;
+    box-shadow: 0 4px 0 0 var(--teal-s);
+}
+.btn-yellow {
+    background: var(--yellow);
+    color: var(--fg);
+    box-shadow: 0 4px 0 0 var(--yellow-s);
+}
+.btn-outline {
+    background: transparent;
+    color: var(--muted);
+    border: 2px solid var(--border);
+    box-shadow: none;
+}
+.btn-outline:hover {
+    border-color: var(--muted);
+}
+
+.btn-full {
+    width: 100%;
+}
+
+/* === INPUT RÉPONSE === */
+.answer-input {
+    width: 100%;
+    padding: 14px 18px;
+    font-family: "Fredoka", sans-serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    text-align: center;
+    border: 3px solid var(--border);
+    border-radius: 14px;
+    background: var(--card);
+    color: var(--fg);
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+.answer-input::-webkit-inner-spin-button,
+.answer-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+.answer-input:focus {
+    border-color: var(--teal);
+}
+.answer-input.shake {
+    animation: inputShake 0.4s ease;
+}
+@keyframes inputShake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    20% {
+        transform: translateX(-8px);
+    }
+    40% {
+        transform: translateX(8px);
+    }
+    60% {
+        transform: translateX(-5px);
+    }
+    80% {
+        transform: translateX(5px);
+    }
+}
+
+/* === CHOIX FRACTION === */
+.fraction-choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.fraction-choice {
+    padding: 14px;
+    border-radius: 12px;
+    border: 3px solid var(--border);
+    background: var(--card);
+    font-family: "Fredoka", sans-serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+}
+.fraction-choice:hover {
+    border-color: var(--orange);
+    background: #fff8f0;
+}
+.fraction-choice.correct {
+    border-color: var(--green);
+    background: #e8f5e9;
+    color: var(--green);
+}
+.fraction-choice.wrong {
+    border-color: var(--red);
+    background: #ffebee;
+    color: var(--red);
+}
+.fraction-choice.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* === BARRE DE PROGRESSION === */
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+/* === FEEDBACK === */
+.feedback-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.feedback-overlay.show {
+    opacity: 1;
+}
+.feedback-text {
+    font-family: "Fredoka", sans-serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    padding: 16px 36px;
+    border-radius: 20px;
+    animation: feedbackPop 0.4s ease;
+}
+@keyframes feedbackPop {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+.feedback-correct {
+    background: rgba(0, 133, 43, 0.92);
+    color: #fff;
+}
+.feedback-wrong {
+    background: rgba(208, 16, 18, 0.88);
+    color: #fff;
+}
+.feedback-retry {
+    background: rgba(254, 138, 24, 0.9);
+    color: #fff;
+}
+.feedback-answer {
+    background: rgba(45, 45, 45, 0.88);
+    color: #fff;
+    font-size: 1.3rem;
+    padding: 12px 24px;
+}
+
+/* === ÉTOILES === */
+.star {
+    font-size: 2.2rem;
+    transition:
+        transform 0.3s ease,
+        opacity 0.3s ease;
+}
+.star.filled {
+    color: var(--yellow);
+    transform: scale(1);
+}
+.star.empty {
+    color: var(--border);
+    transform: scale(0.85);
+    opacity: 0.5;
+}
+
+/* === PROFIL AVATAR === */
+.avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #fff;
+}
+
+/* === MODULE ICONE === */
+.module-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+/* === CANVAS CONFETTI === */
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 200;
+}
+
+/* === ANIMATIONS D'ENTRÉE === */
+.fade-in {
+    animation: fadeIn 0.4s ease forwards;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.fade-in-delay-1 {
+    animation-delay: 0.08s;
+    opacity: 0;
+}
+.fade-in-delay-2 {
+    animation-delay: 0.16s;
+    opacity: 0;
+}
+.fade-in-delay-3 {
+    animation-delay: 0.24s;
+    opacity: 0;
+}
+.fade-in-delay-4 {
+    animation-delay: 0.32s;
+    opacity: 0;
+}
+
+/* === VISUEL QUESTION === */
+.visual-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 10px;
+    min-height: 100px;
+}
+.visual-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.operator {
+    font-family: "Fredoka", sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--muted);
+    align-self: center;
+    padding-top: 4px;
+}
+
+/* === SCORE BADGE === */
+.score-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: #fff8e1;
+    font-family: "Fredoka", sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #f5a623;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 380px) {
+    .title-lego {
+        font-size: 2.2rem;
+    }
+    .brick {
+        width: 26px;
+        height: 19px;
+    }
+    .brick .stud {
+        width: 12px;
+        height: 6px;
+        top: -4px;
+    }
+    .plate-section {
+        --pw: 58px;
+        --ph: 44px;
+    }
+    .plate-stud {
+        width: 11px;
+        height: 5px;
+    }
+    .fraction-choice {
+        font-size: 1.2rem;
+        padding: 10px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* === HOME PAGE STYLES === */
+.home-container {
+    text-align: center;
+    padding-top: 12vh;
+}
+
+.home-title {
+    margin-bottom: 6px;
+}
+
+.home-subtitle {
+    margin-bottom: 40px;
+}
+
+.home-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.home-decor {
+    margin-top: 50px;
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0.35;
+}
+
+/* === MODULES PAGE STYLES === */
+.modules-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.modules-back {
+    margin-bottom: 20px;
+}
+
+.modules-title {
+    font-family: "Fredoka", sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+}
+
+.modules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.module-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+}
+
+.module-card-icon {
+    flex-shrink: 0;
+}
+
+.module-card-text {
+    flex: 1;
+}
+
+.module-card-title {
+    font-family: "Fredoka", sans-serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+}
+
+.module-card-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.module-card-arrow {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+/* === GAME PAGE STYLES === */
+.game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.game-progress {
+    margin-bottom: 20px;
+}
+
+.game-question-num {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 12px;
+}
+
+.game-visual-card {
+    margin-bottom: 16px;
+    overflow-x: auto;
+}
+
+.game-question-text {
+    margin-bottom: 16px;
+}
+
+.game-answer-area {
+    margin-bottom: 16px;
+}
+
+.game-answer-input-wrapper {
+    margin-top: 10px;
+}
+
+/* === RESULTS PAGE STYLES === */
+.results-container {
+    text-align: center;
+    padding-top: 6vh;
+}
+
+.results-header {
+    margin-bottom: 24px;
+}
+
+.results-stars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.results-score {
+    margin-bottom: 20px;
+}
+
+.results-message {
+    color: var(--muted);
+    font-size: 1rem;
+}
+
+.results-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 280px;
+    margin: 0 auto;
+}
+
+/* === QUIT MODAL === */
+.quit-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.quit-modal-content {
+    max-width: 300px;
+    text-align: center;
+}
+
+.quit-modal-text {
+    font-family: "Fredoka", sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+}
+
+.quit-modal-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.quit-modal-btn {
+    flex: 1;
+}
