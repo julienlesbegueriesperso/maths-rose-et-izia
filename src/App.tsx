@@ -90,23 +90,23 @@ const App = () => {
     });
   }
 
-  function handleNextQuestion(updatedScore: number) {
+  const handleNextQuestion = useCallback((updatedScore: number) => {
     const newIndex = state.qIndex + 1;
     if (newIndex >= TOTAL_QUESTIONS) {
-      setState({ ...state, screen: "results", score: updatedScore });
+      setState((prev) => ({ ...prev, screen: "results", score: updatedScore }));
       playSoundEffect("star");
       spawnConfetti();
       setTimeout(spawnConfetti, 400);
     } else {
-      setState({
-        ...state,
+      setState((prev) => ({
+        ...prev,
         qIndex: newIndex,
         attempts: 0,
         locked: false,
         score: updatedScore,
-      });
+      }));
     }
-  }
+  }, [state.qIndex, playSoundEffect, spawnConfetti]);
 
   function handleQuit() {
     setState({ ...state, screen: "modules" });

@@ -45,6 +45,13 @@ export function GameScreen({
     }, 100);
   }, [qIndex]);
 
+  useEffect(() => {
+    document.querySelectorAll(".fraction-choice").forEach((btn) => {
+      btn.classList.remove("disabled", "correct", "wrong");
+      (btn as HTMLElement).style.opacity = "1";
+    });
+  }, [qIndex]);
+
   function bounceBricks() {
     document
       .querySelectorAll(".brick")
